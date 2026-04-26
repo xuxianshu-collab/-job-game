@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>직업 말하기 게임</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .question-area {
+            background: #f8f9ff;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+        }
+
+        .question-text {
+            font-size: 2em;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .image-container {
+            margin: 30px 0;
+        }
+
+        .job-image {
+            width: 100%;
+            max-width: 400px;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .controls {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+
+        button {
+            padding: 20px 40px;
+            font-size: 1.3em;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .mic-button {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            font-size: 1.5em;
+            padding: 25px 50px;
+        }
+
+        .mic-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(245, 87, 108, 0.4);
+        }
+
+        .mic-button:active {
+            transform: translateY(0);
+        }
+
+        .mic-button.listening {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .next-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .next-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .play-question-button {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .play-question-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(79, 172, 254, 0.4);
+        }
+
+        .feedback {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 15px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .feedback.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .score {
+            font-size: 1.5em;
+            color: #667eea;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        .transcript {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-size: 1.2em;
+            color: #856404;
+            min-height: 50px;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.8em; }
+            .question-text { font-size: 1.5em; }
+            button { padding: 15px 30px; font-size: 1.1em; }
+            .job-image { max-width: 300px; height: 300px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🎤 직업 말하기 게임</h1>
+        
+        <div class="question-area">
+            <div class="question-text">他做什么工作？</div>
+            <button class="play-question-button" onclick="playQuestion()">🔊 질문 듣기</button>
+        </div>
+
+        <div class="image-container">
+            <img id="jobImage" class="job-image" src="" alt="직업 이미지">
+        </div>
+
+        <div class="transcript" id="transcript">여기에 인식된 음성이 표시됩니다</div>
+
+        <div class="controls">
+            <button class="mic-button" id="micButton" onclick="startListening()">
+                🎤 말하기
+            </button>
+        </div>
+
+        <div class="feedback" id="feedback"></div>
+
+        <div class="score" id="score">점수: 0 / 0</div>
+
+        <button class="next-button" onclick="nextQuestion()">다음 문제 ➡️</button>
+    </div>
+
+    <script>
+        // 직업 데이터
+        const jobs = [
+            { name: 'xuesheng', chinese: '学生', image: 'xuesheng.jpg', audio: 'answer-xuesheng.mp3' },
+            { name: 'laoshi', chinese: '老师', image: 'laoshi.jpg', audio: 'answer-laoshi.mp3' },
+            { name: 'jingcha', chinese: '警察', image: 'jingcha.jpg', audio: 'answer-jingcha.mp3' },
+            { name: 'chushi', chinese: '厨师', image: 'chushi.jpg', audio: 'answer-chushi.mp3' },
+            { name: 'huajia', chinese: '画家', image: 'huajia.jpg', audio: 'answer-huajia.mp3' },
+            { name: 'geshou', chinese: '歌手', image: 'geshou.jpg', audio: 'answer-geshou.mp3' },
+            { name: 'yisheng', chinese: '医生', image: 'yisheng.jpg', audio: 'answer-yisheng.mp3' }
+        ];
+
+        let currentJob = null;
+        let score = 0;
+        let totalQuestions = 0;
+        let recognition = null;
+
+        // 음성 인식 초기화
+        if ('webkitSpeechRecognition' in window) {
+            recognition = new webkitSpeechRecognition();
+            recognition.lang = 'zh-CN';
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('transcript').textContent = '들은 내용: ' + transcript;
+                checkAnswer(transcript);
+                document.getElementById('micButton').classList.remove('listening');
+                document.getElementById('micButton').textContent = '🎤 말하기';
+            };
+
+            recognition.onerror = function(event) {
+                document.getElementById('transcript').textContent = '오류: 다시 시도해주세요';
+                document.getElementById('micButton').classList.remove('listening');
+                document.getElementById('micButton').textContent = '🎤 말하기';
+            };
+
+            recognition.onend = function() {
+                document.getElementById('micButton').classList.remove('listening');
+                document.getElementById('micButton').textContent = '🎤 말하기';
+            };
+        } else {
+            alert('이 브라우저는 음성 인식을 지원하지 않습니다. Chrome을 사용해주세요.');
+        }
+
+        // 질문 음성 재생
+        function playQuestion() {
+            const audio = new Audio('question.mp3');
+            audio.play();
+        }
+
+        // 음성 인식 시작
+        function startListening() {
+            if (recognition) {
+                document.getElementById('feedback').textContent = '';
+                document.getElementById('feedback').className = 'feedback';
+                document.getElementById('transcript').textContent = '듣고 있습니다...';
+                document.getElementById('micButton').classList.add('listening');
+                document.getElementById('micButton').textContent = '🎤 듣는 중...';
+                recognition.start();
+            }
+        }
+
+        // 정답 확인
+        function checkAnswer(transcript) {
+            totalQuestions++;
+            const cleanTranscript = transcript.replace(/[。，！？\s]/g, '').toLowerCase();
+            
+            // 핵심 단어가 포함되어 있는지 확인
+            if (cleanTranscript.includes(currentJob.chinese)) {
+                // 정답
+                score++;
+                document.getElementById('feedback').textContent = '✅ 非常好！';
+                document.getElementById('feedback').className = 'feedback correct';
+                const correctAudio = new Audio('correct.mp3');
+                correctAudio.play();
+            } else {
+                // 오답
+                document.getElementById('feedback').textContent = '❌ 정답: 他是' + currentJob.chinese + '。';
+                document.getElementById('feedback').className = 'feedback incorrect';
+                const answerAudio = new Audio(currentJob.audio);
+                answerAudio.play();
+            }
+            
+            updateScore();
+        }
+
+        // 점수 업데이트
+        function updateScore() {
+            document.getElementById('score').textContent = `점수: ${score} / ${totalQuestions}`;
+        }
+
+        // 다음 문제
+        function nextQuestion() {
+            // 랜덤으로 직업 선택
+            currentJob = jobs[Math.floor(Math.random() * jobs.length)];
+            document.getElementById('jobImage').src = currentJob.image;
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('transcript').textContent = '여기에 인식된 음성이 표시됩니다';
+        }
+
+        // 게임 시작
+        nextQuestion();
+    </script>
+</body>
+</html>

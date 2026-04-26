@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>직업 말하기 게임</title>
+    <title>中文职业游戏 - 他(/她)做什么工作？</title>
     <style>
         * {
             margin: 0;
@@ -12,48 +12,86 @@
         }
 
         body {
-            font-family: 'Noto Sans KR', Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
             padding: 20px;
         }
 
-        .game-container {
+        .container {
             background: white;
-            border-radius: 30px;
+            border-radius: 20px;
             padding: 40px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-width: 800px;
+            max-width: 600px;
             width: 100%;
             text-align: center;
         }
 
         h1 {
             color: #667eea;
-            font-size: 2.5em;
-            margin-bottom: 30px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .question-area {
-            background: #f8f9ff;
-            padding: 30px;
-            border-radius: 20px;
-            margin-bottom: 30px;
-        }
-
-        .question-text {
+            margin-bottom: 10px;
             font-size: 2em;
-            color: #333;
+        }
+
+        .pinyin {
+            color: #888;
+            font-size: 0.9em;
             margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .question-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .question {
+            font-size: 2.5em;
+            color: #333;
             font-weight: bold;
+        }
+
+        .listen-button {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1.3em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .listen-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(79, 172, 254, 0.6);
+        }
+
+        .listen-button:active {
+            transform: translateY(0);
+        }
+
+        .question-pinyin {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 30px;
+            font-style: italic;
         }
 
         .image-container {
             margin: 30px 0;
+            position: relative;
         }
 
         .job-image {
@@ -61,83 +99,72 @@
             max-width: 400px;
             height: 400px;
             object-fit: cover;
-            border-radius: 20px;
+            border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
 
         .controls {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
             margin: 30px 0;
         }
 
         button {
-            padding: 20px 40px;
-            font-size: 1.3em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
             border: none;
-            border-radius: 15px;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 50px;
             cursor: pointer;
+            margin: 10px;
             transition: all 0.3s;
-            font-weight: bold;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
         }
 
         .mic-button {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
             font-size: 1.5em;
-            padding: 25px 50px;
-        }
-
-        .mic-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(245, 87, 108, 0.4);
-        }
-
-        .mic-button:active {
-            transform: translateY(0);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .mic-button.listening {
-            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
             animation: pulse 1.5s infinite;
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
         }
 
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        .next-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .next-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .play-question-button {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-        }
-
-        .play-question-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(79, 172, 254, 0.4);
+            50% { transform: scale(1.1); }
         }
 
         .feedback {
-            font-size: 2em;
-            font-weight: bold;
             margin: 20px 0;
             padding: 20px;
-            border-radius: 15px;
-            min-height: 80px;
+            border-radius: 10px;
+            font-size: 1.3em;
+            font-weight: bold;
+            min-height: 60px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
         }
@@ -152,6 +179,13 @@
             color: #721c24;
         }
 
+        .feedback-pinyin {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
         .score {
             font-size: 1.5em;
             color: #667eea;
@@ -159,157 +193,225 @@
             font-weight: bold;
         }
 
-        .transcript {
-            background: #fff3cd;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px 0;
+        .progress {
             font-size: 1.2em;
-            color: #856404;
-            min-height: 50px;
+            color: #764ba2;
+            margin: 15px 0;
         }
 
-        @media (max-width: 600px) {
-            h1 { font-size: 1.8em; }
-            .question-text { font-size: 1.5em; }
-            button { padding: 15px 30px; font-size: 1.1em; }
-            .job-image { max-width: 300px; height: 300px; }
+        .game-over {
+            font-size: 2em;
+            color: #667eea;
+            margin: 30px 0;
+        }
+
+        .final-score {
+            font-size: 1.8em;
+            color: #764ba2;
+            margin: 20px 0;
+        }
+
+        .status {
+            color: #666;
+            margin: 10px 0;
+            font-style: italic;
         }
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <h1>🎤 직업 말하기 게임</h1>
+    <div class="container">
+        <h1>中文职业游戏</h1>
+        <div class="pinyin">Zhōngwén Zhíyè Yóuxì</div>
         
-        <div class="question-area">
-            <div class="question-text">他做什么工作？</div>
-            <button class="play-question-button" onclick="playQuestion()">🔊 질문 듣기</button>
+        <div id="gameArea">
+            <div class="question-container">
+                <div class="question">他(/她)做什么工作？</div>
+                <button class="listen-button" onclick="playQuestionAudio()">🔊 听</button>
+            </div>
+            <div class="question-pinyin">Tā zuò shénme gōngzuò?</div>
+            
+            <div class="progress" id="progress">问题 1 / 7</div>
+            
+            <div class="image-container">
+                <img id="jobImage" class="job-image" src="" alt="职业图片">
+            </div>
+
+            <div class="controls">
+                <button class="mic-button" id="micButton" onclick="startListening()">🎤</button>
+                <div class="status" id="status">点击麦克风开始回答</div>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+            
+            <div class="score" id="score">得分: 0</div>
+
+            <button id="nextButton" onclick="nextQuestion()" style="display:none;">下一题</button>
         </div>
 
-        <div class="image-container">
-            <img id="jobImage" class="job-image" src="" alt="직업 이미지">
+        <div id="gameOverArea" style="display:none;">
+            <div class="game-over">🎉 游戏结束！🎉</div>
+            <div class="game-over" style="font-size: 1.5em; margin: 10px 0;">Yóuxì Jiéshù!</div>
+            <div class="final-score" id="finalScore"></div>
+            <button onclick="restartGame()">再玩一次</button>
+            <div class="pinyin" style="margin-top: 10px;">Zài wán yī cì</div>
         </div>
-
-        <div class="transcript" id="transcript">여기에 인식된 음성이 표시됩니다</div>
-
-        <div class="controls">
-            <button class="mic-button" id="micButton" onclick="startListening()">
-                🎤 말하기
-            </button>
-        </div>
-
-        <div class="feedback" id="feedback"></div>
-
-        <div class="score" id="score">점수: 0 / 0</div>
-
-        <button class="next-button" onclick="nextQuestion()">다음 문제 ➡️</button>
     </div>
 
     <script>
-        // 직업 데이터
         const jobs = [
-            { name: 'xuesheng', chinese: '学生', image: 'xuesheng.jpg', audio: 'answer-xuesheng.mp3' },
-            { name: 'laoshi', chinese: '老师', image: 'laoshi.jpg', audio: 'answer-laoshi.mp3' },
-            { name: 'jingcha', chinese: '警察', image: 'jingcha.jpg', audio: 'answer-jingcha.mp3' },
-            { name: 'chushi', chinese: '厨师', image: 'chushi.jpg', audio: 'answer-chushi.mp3' },
-            { name: 'huajia', chinese: '画家', image: 'huajia.jpg', audio: 'answer-huajia.mp3' },
-            { name: 'geshou', chinese: '歌手', image: 'geshou.jpg', audio: 'answer-geshou.mp3' },
-            { name: 'yisheng', chinese: '医生', image: 'yisheng.jpg', audio: 'answer-yisheng.mp3' }
+            { name: 'xuesheng', chinese: '学生', pinyin: 'xuésheng', image: 'xuesheng.jpg', audio: 'answer-xuesheng.mp3' },
+            { name: 'laoshi', chinese: '老师', pinyin: 'lǎoshī', image: 'laoshi.jpg', audio: 'answer-laoshi.mp3' },
+            { name: 'jingcha', chinese: '警察', pinyin: 'jǐngchá', image: 'jingcha.jpg', audio: 'answer-jingcha.mp3' },
+            { name: 'chushi', chinese: '厨师', pinyin: 'chúshī', image: 'chushi.jpg', audio: 'answer-chushi.mp3' },
+            { name: 'huajia', chinese: '画家', pinyin: 'huàjiā', image: 'huajia.jpg', audio: 'answer-huajia.mp3' },
+            { name: 'geshou', chinese: '歌手', pinyin: 'gēshǒu', image: 'geshou.jpg', audio: 'answer-geshou.mp3' },
+            { name: 'yisheng', chinese: '医生', pinyin: 'yīshēng', image: 'yisheng.jpg', audio: 'answer-yisheng.mp3' }
         ];
 
-        let currentJob = null;
+        let currentJobIndex = 0;
         let score = 0;
-        let totalQuestions = 0;
-        let recognition = null;
+        let isListening = false;
+        let recognition;
+        let jobSequence = [];
 
-        // 음성 인식 초기화
-        if ('webkitSpeechRecognition' in window) {
-            recognition = new webkitSpeechRecognition();
+        // 초기화: 직업 순서를 섞음
+        function initGame() {
+            jobSequence = [...jobs].sort(() => Math.random() - 0.5);
+            currentJobIndex = 0;
+            score = 0;
+            updateScore();
+            loadQuestion();
+            playAudio('question.mp3');
+        }
+
+        function loadQuestion() {
+            if (currentJobIndex >= jobSequence.length) {
+                endGame();
+                return;
+            }
+
+            const currentJob = jobSequence[currentJobIndex];
+            document.getElementById('jobImage').src = currentJob.image;
+            document.getElementById('feedback').innerHTML = '';
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('nextButton').style.display = 'none';
+            document.getElementById('status').textContent = '点击麦克风开始回答';
+            document.getElementById('progress').textContent = `问题 ${currentJobIndex + 1} / 7`;
+        }
+
+        function playQuestionAudio() {
+            playAudio('question.mp3');
+        }
+
+        function startListening() {
+            if (isListening) return;
+
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                alert('您的浏览器不支持语音识别。请使用Chrome浏览器。');
+                return;
+            }
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
             recognition.lang = 'zh-CN';
             recognition.continuous = false;
             recognition.interimResults = false;
 
+            recognition.onstart = function() {
+                isListening = true;
+                document.getElementById('micButton').classList.add('listening');
+                document.getElementById('status').textContent = '正在听...';
+            };
+
             recognition.onresult = function(event) {
                 const transcript = event.results[0][0].transcript;
-                document.getElementById('transcript').textContent = '들은 내용: ' + transcript;
+                console.log('识别结果:', transcript);
                 checkAnswer(transcript);
-                document.getElementById('micButton').classList.remove('listening');
-                document.getElementById('micButton').textContent = '🎤 말하기';
             };
 
             recognition.onerror = function(event) {
-                document.getElementById('transcript').textContent = '오류: 다시 시도해주세요';
+                console.error('识别错误:', event.error);
+                document.getElementById('status').textContent = '识别失败，请重试';
+                isListening = false;
                 document.getElementById('micButton').classList.remove('listening');
-                document.getElementById('micButton').textContent = '🎤 말하기';
             };
 
             recognition.onend = function() {
+                isListening = false;
                 document.getElementById('micButton').classList.remove('listening');
-                document.getElementById('micButton').textContent = '🎤 말하기';
             };
-        } else {
-            alert('이 브라우저는 음성 인식을 지원하지 않습니다. Chrome을 사용해주세요.');
+
+            recognition.start();
         }
 
-        // 질문 음성 재생
-        function playQuestion() {
-            const audio = new Audio('question.mp3');
-            audio.play();
-        }
+        function checkAnswer(userAnswer) {
+            const currentJob = jobSequence[currentJobIndex];
+            const correctAnswers = [
+                `他是${currentJob.chinese}`,
+                `她是${currentJob.chinese}`,
+                currentJob.chinese
+            ];
 
-        // 음성 인식 시작
-        function startListening() {
-            if (recognition) {
-                document.getElementById('feedback').textContent = '';
-                document.getElementById('feedback').className = 'feedback';
-                document.getElementById('transcript').textContent = '듣고 있습니다...';
-                document.getElementById('micButton').classList.add('listening');
-                document.getElementById('micButton').textContent = '🎤 듣는 중...';
-                recognition.start();
-            }
-        }
+            const isCorrect = correctAnswers.some(answer => 
+                userAnswer.includes(answer) || answer.includes(userAnswer)
+            );
 
-        // 정답 확인
-        function checkAnswer(transcript) {
-            totalQuestions++;
-            const cleanTranscript = transcript.replace(/[。，！？\s]/g, '').toLowerCase();
+            const feedbackDiv = document.getElementById('feedback');
             
-            // 핵심 단어가 포함되어 있는지 확인
-            if (cleanTranscript.includes(currentJob.chinese)) {
-                // 정답
-                score++;
-                document.getElementById('feedback').textContent = '✅ 非常好！';
-                document.getElementById('feedback').className = 'feedback correct';
-                const correctAudio = new Audio('correct.mp3');
-                correctAudio.play();
+            if (isCorrect) {
+                score += 10;
+                updateScore();
+                feedbackDiv.className = 'feedback correct';
+                feedbackDiv.innerHTML = `
+                    <div>✅ 非常好！正确答案是：他是${currentJob.chinese}</div>
+                    <div class="feedback-pinyin">Tā shì ${currentJob.pinyin}</div>
+                `;
+                playAudio('correct.mp3');
+                setTimeout(() => playAudio(currentJob.audio), 1000);
             } else {
-                // 오답
-                document.getElementById('feedback').textContent = '❌ 정답: 他是' + currentJob.chinese + '。';
-                document.getElementById('feedback').className = 'feedback incorrect';
-                const answerAudio = new Audio(currentJob.audio);
-                answerAudio.play();
+                feedbackDiv.className = 'feedback incorrect';
+                feedbackDiv.innerHTML = `
+                    <div>❌ 再试试！正确答案是：他是${currentJob.chinese}</div>
+                    <div class="feedback-pinyin">Tā shì ${currentJob.pinyin}</div>
+                `;
+                playAudio(currentJob.audio);
             }
-            
-            updateScore();
+
+            document.getElementById('status').textContent = '你说了: ' + userAnswer;
+            document.getElementById('nextButton').style.display = 'inline-block';
         }
 
-        // 점수 업데이트
-        function updateScore() {
-            document.getElementById('score').textContent = `점수: ${score} / ${totalQuestions}`;
-        }
-
-        // 다음 문제
         function nextQuestion() {
-            // 랜덤으로 직업 선택
-            currentJob = jobs[Math.floor(Math.random() * jobs.length)];
-            document.getElementById('jobImage').src = currentJob.image;
-            document.getElementById('feedback').textContent = '';
-            document.getElementById('feedback').className = 'feedback';
-            document.getElementById('transcript').textContent = '여기에 인식된 음성이 표시됩니다';
+            currentJobIndex++;
+            loadQuestion();
+        }
+
+        function updateScore() {
+            document.getElementById('score').textContent = `得分: ${score}`;
+        }
+
+        function endGame() {
+            document.getElementById('gameArea').style.display = 'none';
+            document.getElementById('gameOverArea').style.display = 'block';
+            document.getElementById('finalScore').innerHTML = `
+                <div>你的最终得分: ${score} / 70</div>
+                <div class="pinyin" style="font-size: 0.7em; margin-top: 10px;">Nǐ de zuìzhōng défēn</div>
+            `;
+        }
+
+        function restartGame() {
+            document.getElementById('gameArea').style.display = 'block';
+            document.getElementById('gameOverArea').style.display = 'none';
+            initGame();
+        }
+
+        function playAudio(filename) {
+            const audio = new Audio(filename);
+            audio.play().catch(e => console.log('音频播放失败:', e));
         }
 
         // 게임 시작
-        nextQuestion();
+        window.onload = initGame;
     </script>
 </body>
 </html>
